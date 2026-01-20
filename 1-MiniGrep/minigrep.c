@@ -22,39 +22,46 @@ void usage(char *exename) {
     printf("  -v    inverts match (prints non-matching lines) [EXTRA CREDIT]\n");
 }
 
-/**
- * str_len - calculates the length of a string
- * @str: pointer to null-terminated string
- * 
- * Returns: length of string (not including null terminator)
- * 
- * TODO: IMPLEMENT THIS FUNCTION
- * You must use pointer arithmetic, no array notation
- * Do NOT use strlen() from standard library
- */
 int str_len(char *str) {
-    // TODO: Implement string length calculation
-    return 0;  // placeholder
+    int count = 0;
+    while (*str != '\0') {
+        count++;
+        str++;
+    }
+    return count;
 }
 
-/**
- * str_match - searches for pattern in line
- * @line: the line to search in
- * @pattern: the pattern to search for
- * @case_insensitive: if 1, ignore case; if 0, case-sensitive
- * 
- * Returns: 1 if pattern found, 0 if not found
- * 
- * TODO: IMPLEMENT THIS FUNCTION
- * You must use pointer arithmetic, no array notation
- * Hint: For case-insensitive, use tolower() or toupper() on both characters
- * Hint: You need to check if pattern matches starting at ANY position in line
- */
-int str_match(char *line, char *pattern, int case_insensitive) {
-    // TODO: Implement pattern matching
-    // Remember: pattern can appear anywhere in the line
-    // For case-insensitive, compare characters after converting to same case
-    return 0;  // placeholder
+int str_match(char* line, char* pattern, int case_insensitive) {
+    char* l;
+    char* p;
+    char lc, pc;
+    for (char* c = line; *c != '\0'; c++) {
+        l = c;
+        p = pattern;
+
+        while (*l != '\0' && *p != '\0') {
+            lc = *l;
+            pc = *p;
+
+            if (case_insensitive) {
+                lc = tolower(lc);
+                pc = tolower(pc);
+            }
+
+            if (lc != pc) {
+                break;
+            }
+
+            l++;
+            p++;
+        }
+
+        if (*p == '\0') {
+            return 1;
+        }
+    }
+ 
+    return 0;
 }
 
 int main(int argc, char *argv[]) {
@@ -124,42 +131,54 @@ int main(int argc, char *argv[]) {
     pattern = argv[arg_idx];
     filename = argv[arg_idx + 1];
     
-    // TODO: Allocate memory for line buffer using malloc
-    // Use LINE_BUFFER_SZ for the size
-    // Check if malloc succeeds, if not exit with code 4
+    line_buffer = malloc(LINE_BUFFER_SZ);
+    if (line_buffer == NULL) {
+        exit(4);
+    }
+
+    fp = fopen(filename, "r");
+    if (fp == NULL) {
+        printf("Error: cannot open file %s\n", filename);
+        free(line_buffer);
+        exit(3);
+    }
     
-    
-    // TODO: Open the file
-    // Use fopen() with "r" mode
-    // Check if fopen succeeds, if not print error and exit with code 3
-    
-    
-    // TODO: Read file line by line
-    // Use fgets() to read into line_buffer
-    // Keep track of line_number (starts at 1)
-    // For each line:
-    //   - Call str_match() to check if pattern exists
-    //   - Based on the flags (show_line_nums, case_insensitive, count_only, invert_match)
-    //     print the appropriate output
-    //   - Update match_count if needed
-    //
-    // Hint: fgets() returns NULL when end of file is reached
-    // Hint: fgets() includes the newline character, you may want to handle that
-    
+    while (fgets(line_buffer, LINE_BUFFER_SZ, fp) != NULL) {
+        line_number++;
+
+        found_match = str_match(line_buffer, pattern, case_insensitive);
+        if (invert_match) {
+            found_match = !found_match;
+        }
+
+        if (found_match) {
+            match_count++;
+
+            if (!count_only) {
+                if (show_line_nums) {
+                    printf("%d: %s", line_number, line_buffer);
+                } else {
+                    printf("%s", line_buffer);
+                }
+            }
+        }
+    }
     
     // TODO: Close the file using fclose()
-    
+    fclose(fp);
     
     // TODO: If count_only flag is set, print the match count
     // Format: "Matches found: X" or "No matches found" if count is 0
+    if (count_only) {
+        if (match_count > 0) {
+            printf("Matches found: %d\n", match_count);
+        } else {
+            printf("No matches found\n");
+        }
+    }
     
+    free(line_buffer);
     
-    // TODO: Free the line buffer
-    
-    
-    // Exit with appropriate code
-    // 0 = success (found matches)
-    // 1 = pattern not found
     if (match_count > 0) {
         exit(0);
     } else {

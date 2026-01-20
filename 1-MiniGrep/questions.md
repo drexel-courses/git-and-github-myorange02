@@ -6,13 +6,13 @@ Answer the following questions about your minigrep implementation:
 
 In your `str_match()` function, you need to check if the pattern appears anywhere in the line, not just at the beginning. Explain your approach for checking all possible positions in the line. How do you use pointer arithmetic to advance through the line?
 
-> _Your answer here_
+> _For checking each part of the line, I had to increment the pointer of the line and keep the position, and whenever starting comparison with the pattern,_
 
 ## 2. Case-Insensitive Comparison
 
 When implementing case-insensitive matching (the `-i` flag), you need to compare characters without worrying about case. Explain how you handle the case where the pattern is "error" but the line contains "ERROR" or "Error". What functions did you use and why?
 
-> _Your answer here_
+> _I used tolower() function for lowering all characters from line, character by character. I had to increment pointers to go through all uppercases._
 
 ## 3. Memory Management
 
@@ -20,7 +20,7 @@ Your program allocates a line buffer using `malloc()`. Explain what would happen
    - A program that runs once and exits?
    - A program that runs in a loop processing thousands of files?
 
-> _Your answer here_
+> _Even after forgetting freeing allocated memory, it might not be a hugh problem for a program that runs a single time because it has only small part of memory leaks. For loop processing programs, however, this memory leak cause a huge problem as lowering the performance, malfunctioning, or breaking in the middle of running the program._
 
 ## 4. Buffer Size Choice
 
